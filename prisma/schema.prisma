@@ -1,0 +1,41 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        String     @id @default(cuid())
+  clerkId   String     @unique
+  email     String     @unique
+  credits   Int        @default(5)
+  createdAt DateTime   @default(now())
+  profile   Profile?
+  proposals Proposal[]
+}
+
+model Profile {
+  id           String  @id @default(cuid())
+  userId       String  @unique
+  jobTitle     String
+  bio          String  @db.Text
+  techStack    String  // comma-separated: "React, Node.js, PostgreSQL"
+  portfolioUrl String?
+  user         User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model Proposal {
+  id              String   @id @default(cuid())
+  userId          String
+  jobDescription  String   @db.Text
+  tone            String   // "aggressive" | "professional" | "concise"
+  generatedText   String   @db.Text
+  createdAt       DateTime @default(now())
+  user            User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([createdAt])
+}
