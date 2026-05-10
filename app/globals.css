@@ -1,7 +1,13 @@
 @import "tailwindcss";
+@import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@400;500;600;700&display=swap');
 
 @theme {
   --font-sans: var(--font-inter);
+  --font-arabic: 'IBM Plex Sans Arabic', sans-serif;
+}
+
+[dir="rtl"] {
+  font-family: var(--font-arabic);
 }
 
 :root {

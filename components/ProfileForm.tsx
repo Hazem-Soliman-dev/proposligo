@@ -4,57 +4,20 @@ import { useActionState, useEffect, useRef } from "react";
 import { upsertProfile } from "@/actions/profile";
 import type { ProfileFormState } from "@/actions/profile";
 import type { ProfileData } from "@/types";
+import { useLanguage } from "@/lib/contexts/LanguageContext";
 
 interface ProfileFormProps {
-  lang: "en" | "ar";
   initialData: ProfileData | null;
   onClose: () => void;
   onSaved: () => void;
 }
 
-const DICTIONARY = {
-  en: {
-    title: "Personal Profile",
-    subtitle: "This info is woven into every proposal you generate.",
-    jobTitleLabel: "Job Title",
-    jobTitlePlaceholder: "e.g. Full-Stack Developer",
-    bioLabel: "Bio",
-    bioPlaceholder: "Describe your experience, specialties, and what you bring to the table...",
-    techStackLabel: "Tech Stack",
-    techStackPlaceholder: "e.g. React, Next.js, Node.js, TypeScript, PostgreSQL",
-    techStackHint: "Comma-separated. Only relevant skills are injected per proposal.",
-    portfolioUrlLabel: "Portfolio URL",
-    portfolioUrlPlaceholder: "https://yourportfolio.com",
-    cancel: "Cancel",
-    save: "Save Profile",
-    saving: "Saving...",
-    success: "Profile saved successfully!",
-  },
-  ar: {
-    title: "الملف الشخصي",
-    subtitle: "يتم دمج هذه المعلومات في كل عرض عمل تقوم بإنشائه.",
-    jobTitleLabel: "المسمى الوظيفي",
-    jobTitlePlaceholder: "مثلاً: مطور فول ستاك",
-    bioLabel: "نبذة شخصية",
-    bioPlaceholder: "صف خبرتك، تخصصاتك، وما يمكنك تقديمه...",
-    techStackLabel: "المهارات التقنية",
-    techStackPlaceholder: "مثلاً: React, Next.js, Node.js, TypeScript, PostgreSQL",
-    techStackHint: "افصل بينها بفواصل. يتم حقن المهارات ذات الصلة فقط في العرض.",
-    portfolioUrlLabel: "رابط معرض الأعمال",
-    portfolioUrlPlaceholder: "https://yourportfolio.com",
-    cancel: "إلغاء",
-    save: "حفظ الملف",
-    saving: "جاري الحفظ...",
-    success: "تم حفظ الملف الشخصي بنجاح!",
-  },
-};
-
 const initialState: ProfileFormState = { success: false, error: null };
 
-export default function ProfileForm({ lang, initialData, onClose, onSaved }: ProfileFormProps) {
+export default function ProfileForm({ initialData, onClose, onSaved }: ProfileFormProps) {
+  const { lang, t } = useLanguage();
   const [state, formAction, isPending] = useActionState(upsertProfile, initialState);
   const formRef = useRef<HTMLFormElement>(null);
-  const t = DICTIONARY[lang];
 
   useEffect(() => {
     if (state.success) {
@@ -74,7 +37,6 @@ export default function ProfileForm({ lang, initialData, onClose, onSaved }: Pro
   return (
     <div
       className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4"
-      dir={lang === "ar" ? "rtl" : "ltr"}
       onClick={(e) => {
         if (e.target === e.currentTarget) onClose();
       }}
@@ -83,10 +45,7 @@ export default function ProfileForm({ lang, initialData, onClose, onSaved }: Pro
         {/* Header */}
         <div className="flex items-center justify-between px-6 py-4 border-b border-zinc-800">
           <div>
-            <h2 className="text-xl font-bold text-zinc-100">{t.title}</h2>
-            <p className="text-sm text-zinc-500 mt-0.5">
-              {t.subtitle}
-            </p>
+            <h2 className="text-xl font-bold text-zinc-100">{t.profile.title}</h2>
           </div>
           <button
             type="button"
@@ -105,7 +64,7 @@ export default function ProfileForm({ lang, initialData, onClose, onSaved }: Pro
           {/* Success */}
           {state.success && (
             <div className="p-3 bg-emerald-900/30 border border-emerald-800 text-emerald-200 rounded-lg text-sm">
-              {t.success}
+              {lang === "ar" ? "تم حفظ الملف الشخصي بنجاح!" : "Profile saved successfully!"}
             </div>
           )}
 
@@ -119,7 +78,7 @@ export default function ProfileForm({ lang, initialData, onClose, onSaved }: Pro
           {/* Job Title */}
           <div className="space-y-1.5">
             <label htmlFor="profile-jobTitle" className="text-sm font-semibold text-zinc-300 text-start block">
-              {t.jobTitleLabel} <span className="text-red-400">*</span>
+              {t.profile.jobTitle} <span className="text-red-400">*</span>
             </label>
             <input
               id="profile-jobTitle"
@@ -128,7 +87,7 @@ export default function ProfileForm({ lang, initialData, onClose, onSaved }: Pro
               required
               maxLength={120}
               defaultValue={initialData?.jobTitle ?? ""}
-              placeholder={t.jobTitlePlaceholder}
+              placeholder={lang === "ar" ? "مثلاً: مطور فول ستاك" : "e.g. Full-Stack Developer"}
               className="w-full px-4 py-3 rounded-xl bg-zinc-950 border border-zinc-800 text-zinc-100 placeholder:text-zinc-600 focus:ring-2 focus:ring-emerald-500 focus:border-transparent transition-shadow text-sm"
             />
           </div>
@@ -136,7 +95,7 @@ export default function ProfileForm({ lang, initialData, onClose, onSaved }: Pro
           {/* Bio */}
           <div className="space-y-1.5">
             <label htmlFor="profile-bio" className="text-sm font-semibold text-zinc-300 text-start block">
-              {t.bioLabel} <span className="text-red-400">*</span>
+              {t.profile.bio} <span className="text-red-400">*</span>
             </label>
             <textarea
               id="profile-bio"
@@ -145,7 +104,7 @@ export default function ProfileForm({ lang, initialData, onClose, onSaved }: Pro
               maxLength={1000}
               rows={3}
               defaultValue={initialData?.bio ?? ""}
-              placeholder={t.bioPlaceholder}
+              placeholder={lang === "ar" ? "صف خبرتك، تخصصاتك، وما يمكنك تقديمه..." : "Describe your experience, specialties, and what you bring to the table..."}
               className="w-full px-4 py-3 rounded-xl bg-zinc-950 border border-zinc-800 text-zinc-100 placeholder:text-zinc-600 focus:ring-2 focus:ring-emerald-500 focus:border-transparent resize-none transition-shadow text-sm"
             />
           </div>
@@ -153,7 +112,7 @@ export default function ProfileForm({ lang, initialData, onClose, onSaved }: Pro
           {/* Tech Stack */}
           <div className="space-y-1.5">
             <label htmlFor="profile-techStack" className="text-sm font-semibold text-zinc-300 text-start block">
-              {t.techStackLabel} <span className="text-red-400">*</span>
+              {t.profile.techStack} <span className="text-red-400">*</span>
             </label>
             <input
               id="profile-techStack"
@@ -162,16 +121,16 @@ export default function ProfileForm({ lang, initialData, onClose, onSaved }: Pro
               required
               maxLength={500}
               defaultValue={initialData?.techStack ?? ""}
-              placeholder={t.techStackPlaceholder}
+              placeholder={lang === "ar" ? "مثلاً: React, Next.js, Node.js, TypeScript, PostgreSQL" : "e.g. React, Next.js, Node.js, TypeScript, PostgreSQL"}
               className="w-full px-4 py-3 rounded-xl bg-zinc-950 border border-zinc-800 text-zinc-100 placeholder:text-zinc-600 focus:ring-2 focus:ring-emerald-500 focus:border-transparent transition-shadow text-sm"
             />
-            <p className="text-xs text-zinc-600">{t.techStackHint}</p>
+            <p className="text-xs text-zinc-600">{lang === "ar" ? "افصل بينها بفواصل. يتم حقن المهارات ذات الصلة فقط في العرض." : "Comma-separated. Only relevant skills are injected per proposal."}</p>
           </div>
 
           {/* Portfolio URL */}
           <div className="space-y-1.5">
             <label htmlFor="profile-portfolioUrl" className="text-sm font-semibold text-zinc-300 text-start block">
-              {t.portfolioUrlLabel}
+              {t.profile.portfolio}
             </label>
             <input
               id="profile-portfolioUrl"
@@ -179,7 +138,7 @@ export default function ProfileForm({ lang, initialData, onClose, onSaved }: Pro
               type="url"
               maxLength={255}
               defaultValue={initialData?.portfolioUrl ?? ""}
-              placeholder={t.portfolioUrlPlaceholder}
+              placeholder="https://yourportfolio.com"
               className="w-full px-4 py-3 rounded-xl bg-zinc-950 border border-zinc-800 text-zinc-100 placeholder:text-zinc-600 focus:ring-2 focus:ring-emerald-500 focus:border-transparent transition-shadow text-sm"
             />
           </div>
@@ -191,7 +150,7 @@ export default function ProfileForm({ lang, initialData, onClose, onSaved }: Pro
               onClick={onClose}
               className="flex-1 py-3 rounded-xl border border-zinc-700 text-zinc-300 font-medium hover:bg-zinc-800 transition-colors cursor-pointer text-sm"
             >
-              {t.cancel}
+              {t.common.cancel}
             </button>
             <button
               type="submit"
@@ -204,10 +163,10 @@ export default function ProfileForm({ lang, initialData, onClose, onSaved }: Pro
                     <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
                     <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
                   </svg>
-                  {t.saving}
+                  {t.profile.saving}
                 </span>
               ) : (
-                t.save
+                lang === "ar" ? "حفظ الملف" : "Save Profile"
               )}
             </button>
           </div>
