@@ -2,6 +2,7 @@
 
 import { useState, useTransition, useEffect, useCallback } from "react";
 import Link from "next/link";
+import { UserButton } from "@clerk/nextjs";
 import type { GenerateRequest, GenerateResponse, Tone, Template, ProfileData } from "@/types";
 import ProfileForm from "@/components/ProfileForm";
 import { useLanguage } from "@/lib/contexts/LanguageContext";
@@ -10,7 +11,7 @@ const TONE_OPTIONS: Tone[] = ["professional", "aggressive", "concise", "friendly
 
 export default function Dashboard() {
   const { lang, toggleLang, t } = useLanguage();
-  const [credits, setCredits] = useState(10);
+  const [credits, setCredits] = useState(0);
   const [jobDescription, setJobDescription] = useState("");
   const [tone, setTone] = useState<Tone>("professional");
   const [template, setTemplate] = useState<Template>("upwork_cover");
@@ -29,6 +30,9 @@ export default function Dashboard() {
       if (res.ok) {
         const data = await res.json();
         setProfileData(data.profile);
+        if (typeof data.credits === 'number') {
+          setCredits(data.credits);
+        }
       }
     } catch {
       // Profile fetch is non-critical, silently ignore
@@ -110,6 +114,13 @@ export default function Dashboard() {
               >
                 {lang === "en" ? "AR" : "EN"}
               </button>
+              <UserButton
+                appearance={{
+                  elements: {
+                    avatarBox: "w-10 h-10 border border-zinc-700 shadow-sm",
+                  },
+                }}
+              />
               <button
                 id="edit-profile-btn"
                 type="button"
@@ -284,6 +295,17 @@ export default function Dashboard() {
             </div>
             <span className="text-[10px] font-bold uppercase tracking-tight">{lang === 'en' ? 'عربي' : 'EN'}</span>
           </button>
+
+          <div className="flex flex-col items-center gap-1 flex-1">
+            <UserButton
+              appearance={{
+                elements: {
+                  avatarBox: "w-5 h-5",
+                },
+              }}
+            />
+            <span className="text-[10px] font-bold uppercase tracking-tight text-zinc-500 mt-1">{t.common.profile || "Account"}</span>
+          </div>
 
           <button
             onClick={() => setShowProfileModal(true)}

@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
+import { ensureUser } from "@/lib/auth";
 import { Groq } from "groq-sdk";
 import type { GenerateRequest } from "@/types";
 import { buildSystemPrompt } from "@/lib/prompts";
@@ -33,9 +34,17 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: "Invalid language selected." }, { status: 400 });
     }
 
-    // 2. Fetch User & Profile (Mocking auth for MVP, using seed user)
-    const user = await prisma.user.findFirst({
-      where: { clerkId: "demo_user" },
+    // 2. Authenticate & ensure DB user exists
+    let dbUser;
+    try {
+      dbUser = await ensureUser();
+    } catch {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
+    // 3. Fetch profile
+    const user = await prisma.user.findUnique({
+      where: { id: dbUser.id },
       include: { profile: true },
     });
 

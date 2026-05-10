@@ -1,3 +1,5 @@
+// NOTE: This seed is for local development only.
+// In production, users are created automatically via Clerk auth (ensureUser helper).
 import { PrismaClient } from "@prisma/client";
 
 const prisma = new PrismaClient();

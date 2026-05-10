@@ -2,6 +2,7 @@
 
 import { revalidatePath } from "next/cache";
 import { prisma } from "@/lib/prisma";
+import { ensureUser } from "@/lib/auth";
 
 export interface ProfileFormState {
   success: boolean;
@@ -15,7 +16,6 @@ interface ProfileInput {
   portfolioUrl: string;
 }
 
-const DEMO_CLERK_ID = "demo_user";
 
 const MAX_JOB_TITLE_LENGTH = 120;
 const MAX_BIO_LENGTH = 1000;
@@ -61,13 +61,12 @@ export async function upsertProfile(
       return { success: false, error: "Portfolio URL must be a valid http or https URL." };
     }
 
-    // --- Fetch demo user ---
-    const user = await prisma.user.findFirst({
-      where: { clerkId: DEMO_CLERK_ID },
-    });
-
-    if (!user) {
-      return { success: false, error: "Demo user not found. Run `npm run db:seed` first." };
+    // --- Authenticate & ensure DB user ---
+    let user;
+    try {
+      user = await ensureUser();
+    } catch {
+      return { success: false, error: "You must be signed in to update your profile." };
     }
 
     // --- Upsert profile ---

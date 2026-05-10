@@ -1,26 +1,33 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
-
-const DEMO_CLERK_ID = "demo_user";
+import { ensureUser } from "@/lib/auth";
 
 export async function GET() {
   try {
-    const user = await prisma.user.findFirst({
-      where: { clerkId: DEMO_CLERK_ID },
+    let dbUser;
+    try {
+      dbUser = await ensureUser();
+    } catch {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
+    const user = await prisma.user.findUnique({
+      where: { id: dbUser.id },
       include: { profile: true },
     });
 
-    if (!user?.profile) {
-      return NextResponse.json({ profile: null });
+    if (!user) {
+      return NextResponse.json({ error: "User not found" }, { status: 404 });
     }
 
     return NextResponse.json({
-      profile: {
+      profile: user.profile ? {
         jobTitle: user.profile.jobTitle,
         bio: user.profile.bio,
         techStack: user.profile.techStack,
         portfolioUrl: user.profile.portfolioUrl,
-      },
+      } : null,
+      credits: user.credits,
     });
   } catch (error: unknown) {
     console.error("Profile API Error:", error);

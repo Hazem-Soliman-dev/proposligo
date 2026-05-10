@@ -2,17 +2,21 @@
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
+import { SignInButton, SignUpButton, useAuth } from "@clerk/nextjs";
 import ProfileForm from "@/components/ProfileForm";
 import { useLanguage } from "@/lib/contexts/LanguageContext";
 
 export default function Home() {
   const { lang, toggleLang, t } = useLanguage();
+  const { isLoaded, userId } = useAuth();
+  const isSignedIn = isLoaded && !!userId;
   const [showProfileModal, setShowProfileModal] = useState(false);
   const [profileData, setProfileData] = useState<any>(null);
 
   useEffect(() => {
     // Fetch profile to see if it exists
     const fetchProfile = async () => {
+      if (!isSignedIn) return;
       try {
         const res = await fetch("/api/profile");
         if (res.ok) {
@@ -24,7 +28,7 @@ export default function Home() {
       }
     };
     fetchProfile();
-  }, []);
+  }, [isSignedIn]);
 
   return (
     <main
@@ -51,13 +55,28 @@ export default function Home() {
           {t.home.hero_subtitle}
         </p>
 
-        <div className="hidden sm:block animate-in fade-in slide-in-from-bottom-16 duration-1000 delay-300">
-          <Link
-            href="/dashboard"
-            className="rounded-full bg-emerald-500 px-10 py-5 text-xl font-bold text-zinc-950 hover:bg-emerald-400 transition-all shadow-[0_0_40px_rgba(16,185,129,0.2)] hover:scale-105 active:scale-95"
-          >
-            {t.home.cta}
-          </Link>
+        <div className="hidden sm:flex gap-4 animate-in fade-in slide-in-from-bottom-16 duration-1000 delay-300">
+          {!isSignedIn ? (
+            <>
+              <SignInButton mode="modal">
+                <button className="rounded-full bg-emerald-500 px-10 py-5 text-xl font-bold text-zinc-950 hover:bg-emerald-400 transition-all shadow-[0_0_40px_rgba(16,185,129,0.2)] hover:scale-105 active:scale-95 cursor-pointer">
+                  {t.home.cta}
+                </button>
+              </SignInButton>
+              <SignUpButton mode="modal">
+                <button className="rounded-full border-2 border-emerald-500 px-10 py-5 text-xl font-bold text-emerald-400 hover:bg-emerald-500/10 transition-all hover:scale-105 active:scale-95 cursor-pointer">
+                  {lang === "ar" ? "إنشاء حساب" : "Sign Up"}
+                </button>
+              </SignUpButton>
+            </>
+          ) : (
+            <Link
+              href="/dashboard"
+              className="rounded-full bg-emerald-500 px-10 py-5 text-xl font-bold text-zinc-950 hover:bg-emerald-400 transition-all shadow-[0_0_40px_rgba(16,185,129,0.2)] hover:scale-105 active:scale-95"
+            >
+              {t.common.dashboard}
+            </Link>
+          )}
         </div>
 
         <div className="grid gap-4 sm:gap-6 sm:grid-cols-3 mt-2 sm:mt-8 text-start w-full">
@@ -96,15 +115,26 @@ export default function Home() {
       {/* Mobile Bottom Navigation */}
       <nav className="sm:hidden fixed bottom-6 left-1/2 -translate-x-1/2 w-[90%] max-w-md z-50 bg-zinc-900/80 backdrop-blur-xl border border-zinc-800/50 rounded-2xl shadow-2xl overflow-hidden">
         <div className="flex items-center justify-around h-16 px-4">
-          <Link
-            href="/dashboard"
-            className="flex flex-col items-center gap-1 text-zinc-500 hover:text-emerald-400 transition-colors flex-1"
-          >
-            <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z" />
-            </svg>
-            <span className="text-[10px] font-bold uppercase tracking-tight">{t.common.dashboard}</span>
-          </Link>
+          {!isSignedIn ? (
+            <SignInButton mode="modal">
+              <button className="flex flex-col items-center gap-1 text-zinc-500 hover:text-emerald-400 transition-colors flex-1">
+                <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013-3v1" />
+                </svg>
+                <span className="text-[10px] font-bold uppercase tracking-tight">{lang === "ar" ? "تسجيل" : "Sign In"}</span>
+              </button>
+            </SignInButton>
+          ) : (
+            <Link
+              href="/dashboard"
+              className="flex flex-col items-center gap-1 text-zinc-500 hover:text-emerald-400 transition-colors flex-1"
+            >
+              <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z" />
+              </svg>
+              <span className="text-[10px] font-bold uppercase tracking-tight">{t.common.dashboard}</span>
+            </Link>
+          )}
 
           <button
             onClick={toggleLang}
