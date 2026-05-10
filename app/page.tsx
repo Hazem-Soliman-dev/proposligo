@@ -6,7 +6,6 @@ import { SignInButton, SignUpButton, useAuth } from "@clerk/nextjs";
 import ProfileForm from "@/components/ProfileForm";
 import { useLanguage } from "@/lib/contexts/LanguageContext";
 import SchemaMarkup from "@/components/SchemaMarkup";
-import Logo from "@/components/Logo";
 
 export default function Home() {
   const { lang, toggleLang, t } = useLanguage();
@@ -51,7 +50,6 @@ export default function Home() {
       </div>
 
       <div className="z-10 w-full max-w-5xl items-center justify-center font-sans text-sm flex flex-col space-y-8 sm:space-y-12">
-        <Logo size="lg" className="animate-in fade-in zoom-in duration-1000" />
         <h1 className="text-6xl font-extrabold tracking-tight sm:text-8xl bg-gradient-to-r from-emerald-400 to-cyan-400 bg-clip-text text-transparent pb-2 animate-in fade-in slide-in-from-bottom-8 duration-700">
           ProposliGo
         </h1>
