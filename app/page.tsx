@@ -164,8 +164,8 @@ export default function Home() {
           onClose={() => setShowProfileModal(false)}
           onSaved={() => {
             setShowProfileModal(false);
-          }} 
-          initialData={profileData}        
+          }}
+          initialData={profileData}
         />
       )}
     </main>
