@@ -82,202 +82,223 @@ export default function Dashboard() {
   };
 
   return (
-    <div className="min-h-screen flex flex-col lg:flex-row p-4 lg:p-8 gap-8 pb-24 sm:w-[95%] mx-auto">
-      {/* LEFT PANE - INPUT */}
-      <div className="w-full lg:w-1/2 flex flex-col space-y-6">
-        <div className="flex flex-col space-y-4">
-          <div className="hidden lg:flex items-center justify-between pb-4 border-b border-zinc-800/50 mb-2">
-            <div className="flex items-center gap-3">
-              <Link
-                href="/"
-                className="p-2.5 rounded-xl border border-zinc-800 bg-zinc-900/50 text-zinc-500 hover:text-zinc-200 hover:border-zinc-700 transition-all cursor-pointer shadow-sm group"
-                title={t.common.backToHome}
-              >
-                <svg className="w-5 h-5 group-hover:-translate-x-1 transition-transform rtl:group-hover:translate-x-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d={lang === "ar" ? "M14 5l7 7m0 0l-7 7m7-7H3" : "M10 19l-7-7m0 0l7-7m-7 7h18"} />
-                </svg>
-              </Link>
-              <h1 className="text-xl font-bold text-zinc-100 tracking-tight">ProposliGo</h1>
-            </div>
-            <div className="flex items-center gap-2">
-              <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 shadow-sm">
-                <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
-                  <path d="M13 10V3L4 14h7v7l9-11h-7z" />
-                </svg>
-                <span className="text-xs font-bold whitespace-nowrap">
-                  {credits}
-                </span>
-              </div>
-              <button
-                onClick={toggleLang}
-                className="px-3 py-1.5 rounded-xl border border-zinc-700 bg-zinc-800/50 text-emerald-400 hover:bg-zinc-800 hover:border-zinc-600 transition-all cursor-pointer shadow-sm font-black text-xs min-w-[44px] flex items-center justify-center uppercase"
-                title={lang === "en" ? "Switch to Arabic" : "التغيير إلى الإنجليزية"}
-              >
-                {lang === "en" ? "AR" : "EN"}
-              </button>
-              <UserButton
-                appearance={{
-                  elements: {
-                    avatarBox: "w-10 h-10 border border-zinc-700 shadow-sm",
-                  },
-                }}
-              />
-              <button
-                id="edit-profile-btn"
-                type="button"
-                onClick={() => setShowProfileModal(true)}
-                className="p-2.5 rounded-xl border border-zinc-700 bg-zinc-800/50 text-zinc-300 hover:bg-zinc-800 hover:border-zinc-600 hover:text-zinc-100 transition-all cursor-pointer group shadow-sm flex items-center justify-center"
-              >
-                <svg className="w-5 h-5 text-emerald-400 group-hover:text-emerald-300 transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
-                </svg>
-              </button>
-            </div>
-          </div>
-          <div className="pt-2">
-        <div className="flex items-center justify-between gap-4 mb-1">
-          <div className="flex items-center gap-3 lg:hidden">
-            <h1 className="text-xl font-bold text-zinc-100 tracking-tight">ProposliGo</h1>
-          </div>
-          <div className="flex items-center gap-2 lg:hidden">
-            <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 shadow-sm">
-              <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
-                <path d="M13 10V3L4 14h7v7l9-11h-7z" />
-              </svg>
-              <span className="text-xs font-bold whitespace-nowrap">
-                {credits}
-              </span>
-            </div>
-            <UserButton
-              appearance={{
-                elements: {
-                  avatarBox: "w-9 h-9 border border-zinc-700 shadow-sm",
-                },
-              }}
-            />
-          </div>
-        </div>
-        <div className="pt-2">
-          <div className="flex items-center justify-between gap-4 mb-1">
-            <h2 className="text-2xl font-bold text-zinc-100 tracking-tight">{t.dashboard.title}</h2>
-          </div>
-          <p className="text-zinc-400 text-sm opacity-80 leading-relaxed">{t.dashboard.subtitle}</p>
-        </div>
-          </div>
-        </div>
+    <div className="min-h-screen relative overflow-hidden bg-zinc-950 selection:bg-emerald-500/30">
+      {/* Background Glows */}
+      <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] bg-emerald-500/10 blur-[120px] rounded-full -z-10 animate-pulse" />
+      <div className="absolute bottom-[-10%] right-[-10%] w-[40%] h-[40%] bg-cyan-500/10 blur-[120px] rounded-full -z-10" />
+      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-emerald-500/5 blur-[150px] rounded-full -z-10" />
 
-        {error && (
-          <div className="p-4 bg-red-900/30 border border-red-800 text-red-200 rounded-lg">
-            {error}
-          </div>
-        )}
-
-        {/* Template Selector */}
-        <div className="flex flex-col space-y-3">
-          <label className="text-sm font-semibold text-zinc-300">{t.dashboard.templateLabel}</label>
-          <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
-            {(Object.keys(t.dashboard.templates) as Template[]).map((tempValue) => {
-              const temp = t.dashboard.templates[tempValue];
-              return (
-                <button
-                  key={tempValue}
-                  type="button"
-                  onClick={() => setTemplate(tempValue)}
-                  className={`px-4 py-3 rounded-xl border text-center transition-all ${template === tempValue
-                    ? "border-emerald-500 bg-emerald-500/10 ring-1 ring-emerald-500/30"
-                    : "border-zinc-800 bg-zinc-900 hover:border-zinc-700"
-                    }`}
+      <div className="max-w-7xl mx-auto p-4 lg:p-6 flex flex-col lg:flex-row gap-6 pb-6 lg:pb-8 relative z-10">
+        {/* LEFT PANE - INPUT */}
+        <div className="w-full lg:w-1/2 flex flex-col space-y-6">
+          <div className="rounded-[2.5rem] border-0 sm:border border-zinc-800/40 bg-[#09090b]/80 p-0 sm:p-6 backdrop-blur-2xl shadow-[0_0_50px_rgba(0,0,0,0.5)]">
+            <div className="flex items-center justify-between pb-6 border-b border-zinc-800/50 mb-6">
+              <div className="flex items-center gap-4">
+                <Link
+                  href="/"
+                  className="p-3 rounded-2xl border border-zinc-800 bg-zinc-900/50 text-zinc-400 hover:text-emerald-400 hover:border-emerald-500/30 transition-all cursor-pointer group shadow-sm"
+                  title={t.common.backToHome}
                 >
-                  <p className={`text-sm font-medium ${template === tempValue ? "text-emerald-400" : "text-zinc-200"}`}>
-                    {temp.label}
-                  </p>
+                  <svg className="w-5 h-5 group-hover:-translate-x-1 transition-transform rtl:group-hover:translate-x-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d={lang === "ar" ? "M14 5l7 7m0 0l-7 7m7-7H3" : "M10 19l-7-7m0 0l7-7m-7 7h18"} />
+                  </svg>
+                </Link>
+                <div>
+                  <h1 className="text-xl font-black bg-gradient-to-r from-emerald-400 to-cyan-400 bg-clip-text text-transparent tracking-tighter">ProposliGo</h1>
+                  <div className="flex items-center gap-1.5 mt-0.5">
+                    <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
+                    <span className="text-[10px] font-bold text-zinc-500 uppercase tracking-widest">{t.dashboard.title}</span>
+                  </div>
+                </div>
+              </div>
+              <div className="flex items-center gap-2">
+                <div className="flex items-center p-2 rounded-2xl bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 shadow-inner group transition-all hover:bg-emerald-500/20">
+                  <svg className="w-4 h-4 group-hover:scale-110 transition-transform" fill="currentColor" viewBox="0 0 24 24">
+                    <path d="M13 10V3L4 14h7v7l9-11h-7z" />
+                  </svg>
+                  <span className="text-sm font-black tracking-tight px-1">{credits}</span>
+                </div>
+                <button
+                  onClick={toggleLang}
+                  className="hidden sm:block p-2 rounded-2xl border border-zinc-800 bg-zinc-900/50 text-emerald-400 hover:border-emerald-500/30 transition-all font-black text-xs tracking-widest shadow-sm cursor-pointer"
+                >
+                  {lang === "en" ? "AR" : "EN"}
                 </button>
-              );
-            })}
-          </div>
-        </div>
+                <button
+                  onClick={() => setShowProfileModal(true)}
+                  className="hidden sm:flex p-2 rounded-2xl border border-zinc-800 bg-zinc-900/50 text-zinc-400 hover:text-emerald-400 hover:border-emerald-500/30 transition-all shadow-sm items-center justify-center cursor-pointer group"
+                  title={t.common.profile}
+                >
+                  <svg className="w-4 h-4 group-hover:scale-110 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                  </svg>
+                </button>
+                <div className="pl-1">
+                  <UserButton
+                    appearance={{
+                      elements: {
+                        avatarBox: "w-9 h-9 border-2 border-zinc-800 hover:border-emerald-500/50 transition-all shadow-lg rounded-2xl",
+                      },
+                    }}
+                  />
+                </div>
+              </div>
+            </div>
 
-        {/* Job Description */}
-        <div className="flex flex-col space-y-2">
-          <label className="text-sm font-semibold text-zinc-300">{t.dashboard.jobDescriptionLabel}</label>
-          <textarea
-            className="w-full h-48 p-4 rounded-xl bg-zinc-900 border border-zinc-800 text-zinc-100 placeholder:text-zinc-600 focus:ring-2 focus:ring-emerald-500 focus:border-transparent resize-none transition-shadow"
-            placeholder={t.dashboard.jobDescriptionPlaceholder}
-            value={jobDescription}
-            onChange={(e) => setJobDescription(e.target.value)}
-          />
-          <div className="text-xs text-zinc-500 text-end">
-            {jobDescription.length} / 5000 {t.dashboard.chars}
-          </div>
-        </div>
+            {error && (
+              <div className="mb-6 p-4 bg-red-900/20 border border-red-500/30 text-red-400 rounded-2xl text-sm font-medium animate-in fade-in slide-in-from-top-2">
+                {error}
+              </div>
+            )}
 
-        {/* Tone Selector */}
-        <div className="flex flex-col space-y-2">
-          <label className="text-sm font-semibold text-zinc-300">{t.dashboard.toneLabel}</label>
-          <div className="flex flex-wrap gap-2">
-            {TONE_OPTIONS.map((toneValue) => (
+            <div className="space-y-8">
+              {/* Template Selector */}
+              <div className="flex flex-col space-y-4">
+                <label className="text-xs font-bold text-zinc-500 uppercase tracking-widest px-1">{t.dashboard.templateLabel}</label>
+                <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+                  {(Object.keys(t.dashboard.templates) as Template[]).map((tempValue) => {
+                    const temp = t.dashboard.templates[tempValue];
+                    const isActive = template === tempValue;
+                    return (
+                      <button
+                        key={tempValue}
+                        type="button"
+                        onClick={() => setTemplate(tempValue)}
+                        className={`group relative p-4 rounded-[1.5rem] border transition-all duration-300 overflow-hidden ${isActive
+                          ? "border-emerald-500/50 bg-emerald-500/10 shadow-[0_0_20px_rgba(16,185,129,0.1)]"
+                          : "border-zinc-800/50 bg-zinc-900/30 hover:border-zinc-700"
+                          }`}
+                      >
+                        <div className={`absolute inset-0 bg-gradient-to-br from-emerald-500/5 to-transparent transition-opacity duration-300 ${isActive ? "opacity-100" : "opacity-0 group-hover:opacity-100"}`} />
+                        <p className={`text-xs font-black relative z-10 transition-colors duration-300 ${isActive ? "text-emerald-400" : "text-zinc-400 group-hover:text-zinc-200"}`}>
+                          {temp.label}
+                        </p>
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+
+              {/* Job Description */}
+              <div className="flex flex-col space-y-4">
+                <label className="text-xs font-bold text-zinc-500 uppercase tracking-widest px-1">{t.dashboard.jobDescriptionLabel}</label>
+                <div className="relative group">
+                  <div className="absolute -inset-0.5 bg-gradient-to-r from-emerald-500/20 to-cyan-500/20 rounded-[1.5rem] blur opacity-0 group-focus-within:opacity-100 transition-opacity duration-500" />
+                  <textarea
+                    className="relative w-full h-48 p-5 rounded-[1.5rem] bg-zinc-900/50 border border-zinc-800 text-zinc-100 placeholder:text-zinc-600 focus:outline-none focus:ring-0 focus:border-emerald-500/50 resize-none transition-all duration-300 text-sm font-medium leading-relaxed"
+                    placeholder={t.dashboard.jobDescriptionPlaceholder}
+                    value={jobDescription}
+                    onChange={(e) => setJobDescription(e.target.value)}
+                  />
+                </div>
+                <div className="flex justify-end items-center px-2">
+                  <span className={`text-[10px] font-bold tracking-widest ${jobDescription.length > 4500 ? "text-red-400" : "text-zinc-600"}`}>
+                    {jobDescription.length} / 5000
+                  </span>
+                </div>
+              </div>
+
+              {/* Tone Selector */}
+              <div className="flex flex-col space-y-4">
+                <label className="text-xs font-bold text-zinc-500 uppercase tracking-widest px-1">{t.dashboard.toneLabel}</label>
+                <div className="flex flex-wrap gap-2">
+                  {TONE_OPTIONS.map((toneValue) => {
+                    const isActive = tone === toneValue;
+                    return (
+                      <button
+                        key={toneValue}
+                        type="button"
+                        onClick={() => setTone(toneValue)}
+                        className={`px-5 py-2.5 rounded-2xl text-[11px] font-black uppercase tracking-wider transition-all duration-300 ${isActive
+                          ? "bg-emerald-500 text-zinc-950 shadow-[0_10px_20px_rgba(16,185,129,0.3)] scale-105"
+                          : "bg-zinc-900/50 text-zinc-500 border border-zinc-800 hover:border-zinc-700 hover:text-zinc-300"
+                          }`}
+                      >
+                        {t.dashboard.tones[toneValue]}
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+
               <button
-                key={toneValue}
-                type="button"
-                onClick={() => setTone(toneValue)}
-                className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${tone === toneValue
-                  ? "bg-emerald-500 text-zinc-950"
-                  : "bg-zinc-800 text-zinc-300 hover:bg-zinc-700"
+                onClick={handleGenerate}
+                disabled={isPending || jobDescription.length === 0 || credits === 0}
+                className="group relative w-full py-5 rounded-[1.5rem] bg-emerald-500 text-zinc-950 font-black text-lg hover:bg-emerald-400 disabled:opacity-50 disabled:cursor-not-allowed transition-all shadow-[0_20px_50px_rgba(16,185,129,0.3)] hover:scale-[1.02] active:scale-[0.98] flex items-center justify-center gap-3 overflow-hidden"
+              >
+                <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent -translate-x-full group-hover:animate-[shimmer_2s_infinite] pointer-events-none" />
+                {isPending ? (
+                  <div className="w-6 h-6 border-4 border-zinc-950/30 border-t-zinc-950 rounded-full animate-spin" />
+                ) : (
+                  <svg className="w-6 h-6 transition-transform group-hover:translate-x-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M13 10V3L4 14h7v7l9-11h-7z" />
+                  </svg>
+                )}
+                {isPending ? t.dashboard.generatingBtn : t.dashboard.generateBtn}
+              </button>
+            </div>
+          </div>
+        </div>
+
+        {/* RIGHT PANE - OUTPUT */}
+        <div className="w-full lg:w-1/2 flex flex-col min-h-[500px] lg:min-h-0 lg:h-[calc(100vh-4rem)] rounded-[2.5rem] border border-zinc-800/40 bg-[#09090b]/80 backdrop-blur-2xl overflow-hidden shadow-[0_0_50px_rgba(0,0,0,0.5)] lg:sticky lg:top-8 group/result">
+          <div className="p-6 border-b border-zinc-800/50 bg-[#09090b]/40 flex justify-between items-center relative z-10">
+            <div className="flex items-center gap-3">
+              <div className="w-2 h-2 rounded-full bg-emerald-500 shadow-[0_0_10px_rgba(16,185,129,0.5)]" />
+              <h2 className="text-sm font-black uppercase tracking-widest text-zinc-400">{t.dashboard.resultTitle}</h2>
+            </div>
+            {proposal && (
+              <button
+                onClick={copyToClipboard}
+                className={`flex items-center gap-2 px-5 py-2.5 rounded-2xl text-xs font-black transition-all border duration-300 ${copied
+                  ? "bg-emerald-500 border-emerald-500 text-zinc-950"
+                  : "bg-emerald-500/10 border-emerald-500/20 text-emerald-400 hover:bg-emerald-500/20 hover:border-emerald-500/40"
                   }`}
               >
-                {t.dashboard.tones[toneValue]}
+                {copied ? (
+                  <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
+                  </svg>
+                ) : (
+                  <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3" />
+                  </svg>
+                )}
+                {copied ? t.common.copied : t.common.copy}
               </button>
-            ))}
+            )}
+          </div>
+
+          <div className="p-8 overflow-y-auto flex-1 relative z-10 selection:bg-emerald-500/30 custom-scrollbar">
+            {isPending ? (
+              <div className="animate-pulse space-y-6">
+                {[1, 2, 3, 4, 5, 6].map((i) => (
+                  <div key={i} className={`h-4 bg-zinc-800/50 rounded-full ${i % 3 === 0 ? "w-2/3" : i % 2 === 0 ? "w-full" : "w-5/6"}`} />
+                ))}
+              </div>
+            ) : proposal ? (
+              <div className="whitespace-pre-wrap text-zinc-200 leading-relaxed font-medium animate-in fade-in duration-700">
+                {proposal}
+              </div>
+            ) : (
+              <div className="h-full flex flex-col items-center justify-center text-zinc-600 space-y-6 animate-in fade-in duration-1000">
+                <div className="relative">
+                  <div className="absolute inset-0 bg-emerald-500/10 blur-3xl rounded-full" />
+                  <svg className="w-20 h-20 relative z-10 text-zinc-800" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                  </svg>
+                </div>
+                <div className="text-center space-y-2">
+                  <p className="font-black uppercase tracking-[0.2em] text-xs opacity-50">{t.dashboard.emptyResult}</p>
+                  <p className="text-zinc-700 text-sm font-medium">{lang === "ar" ? "ابدأ بلصق وصف العمل على اليسار" : "Start by pasting a job description on the left"}</p>
+                </div>
+              </div>
+            )}
           </div>
         </div>
-
-        <button
-          onClick={handleGenerate}
-          disabled={isPending || jobDescription.length === 0 || credits === 0}
-          className="w-full py-4 rounded-2xl bg-emerald-500 text-zinc-950 font-bold hover:bg-emerald-400 disabled:opacity-50 disabled:cursor-not-allowed transition-all shadow-xl shadow-emerald-500/20 flex items-center justify-center gap-2 cursor-pointer text-lg"
-        >
-          {isPending ? t.dashboard.generatingBtn : t.dashboard.generateBtn}
-        </button>
       </div>
 
-      {/* RIGHT PANE - OUTPUT */}
-      <div className="w-full lg:w-1/2 flex flex-col min-h-[500px] lg:min-h-0 lg:h-[calc(100vh-4rem)] rounded-2xl bg-zinc-900 border border-zinc-800 overflow-hidden shadow-2xl lg:sticky lg:top-8">
-        <div className="p-4 border-b border-zinc-800 bg-zinc-900/80 backdrop-blur-sm flex justify-between items-center">
-          <h2 className="text-lg font-semibold text-zinc-100">{t.dashboard.resultTitle}</h2>
-          {proposal && (
-            <button
-              onClick={copyToClipboard}
-              className="px-4 py-2 text-sm font-medium text-emerald-400 bg-emerald-400/10 hover:bg-emerald-400/20 rounded-lg transition-colors border border-emerald-400/20"
-            >
-              {copied ? t.common.copied : t.common.copy}
-            </button>
-          )}
-        </div>
-
-        <div className="p-6 overflow-y-auto flex-1 text-zinc-300 leading-relaxed text-sm lg:text-base prose-custom">
-          {isPending ? (
-            <div className="animate-pulse space-y-4">
-              <div className="h-4 bg-zinc-800 rounded w-3/4"></div>
-              <div className="h-4 bg-zinc-800 rounded w-full"></div>
-              <div className="h-4 bg-zinc-800 rounded w-5/6"></div>
-              <div className="h-4 bg-zinc-800 rounded w-full"></div>
-              <div className="h-4 bg-zinc-800 rounded w-4/5"></div>
-              <div className="h-4 bg-zinc-800 rounded w-2/3 mt-8"></div>
-              <div className="h-4 bg-zinc-800 rounded w-3/4"></div>
-              <div className="h-4 bg-zinc-800 rounded w-full"></div>
-            </div>
-          ) : proposal ? (
-            <div className="whitespace-pre-wrap">{proposal}</div>
-          ) : (
-            <div className="h-full flex flex-col items-center justify-center text-zinc-500 opacity-50 space-y-4">
-              <svg className="w-16 h-16" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-              </svg>
-              <p>{t.dashboard.emptyResult}</p>
-            </div>
-          )}
-        </div>
-      </div>
       {/* Profile Modal */}
       {showProfileModal && (
         <ProfileForm
@@ -289,6 +310,7 @@ export default function Dashboard() {
           }}
         />
       )}
+
       <MobileNav
         items={[
           {
