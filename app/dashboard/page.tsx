@@ -6,6 +6,7 @@ import { UserButton } from "@clerk/nextjs";
 import type { GenerateRequest, GenerateResponse, Tone, Template, ProfileData } from "@/types";
 import ProfileForm from "@/components/ProfileForm";
 import { useLanguage } from "@/lib/contexts/LanguageContext";
+import MobileNav from "@/components/MobileNav";
 
 const TONE_OPTIONS: Tone[] = ["professional", "aggressive", "concise", "friendly", "bold"];
 
@@ -134,19 +135,34 @@ export default function Dashboard() {
             </div>
           </div>
           <div className="pt-2">
-            <div className="flex items-center justify-between gap-4 mb-1">
-              <h2 className="text-2xl font-bold text-zinc-100 tracking-tight">{t.dashboard.title}</h2>
-              {/* Mobile Credits Pill */}
-              <div className="lg:hidden flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 shadow-sm">
-                <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
-                  <path d="M13 10V3L4 14h7v7l9-11h-7z" />
-                </svg>
-                <span className="text-xs font-bold whitespace-nowrap">
-                  {credits}
-                </span>
-              </div>
+        <div className="flex items-center justify-between gap-4 mb-1">
+          <div className="flex items-center gap-3 lg:hidden">
+            <h1 className="text-xl font-bold text-zinc-100 tracking-tight">ProposliGo</h1>
+          </div>
+          <div className="flex items-center gap-2 lg:hidden">
+            <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 shadow-sm">
+              <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
+                <path d="M13 10V3L4 14h7v7l9-11h-7z" />
+              </svg>
+              <span className="text-xs font-bold whitespace-nowrap">
+                {credits}
+              </span>
             </div>
-            <p className="text-zinc-400 text-sm opacity-80 leading-relaxed">{t.dashboard.subtitle}</p>
+            <UserButton
+              appearance={{
+                elements: {
+                  avatarBox: "w-9 h-9 border border-zinc-700 shadow-sm",
+                },
+              }}
+            />
+          </div>
+        </div>
+        <div className="pt-2">
+          <div className="flex items-center justify-between gap-4 mb-1">
+            <h2 className="text-2xl font-bold text-zinc-100 tracking-tight">{t.dashboard.title}</h2>
+          </div>
+          <p className="text-zinc-400 text-sm opacity-80 leading-relaxed">{t.dashboard.subtitle}</p>
+        </div>
           </div>
         </div>
 
@@ -273,51 +289,48 @@ export default function Dashboard() {
           }}
         />
       )}
-      {/* Mobile Bottom Navigation */}
-      <nav className="lg:hidden fixed bottom-6 left-1/2 -translate-x-1/2 w-[90%] max-w-md z-50 bg-zinc-900/80 backdrop-blur-xl border border-zinc-800/50 rounded-2xl shadow-2xl overflow-hidden">
-        <div className="flex items-center justify-around h-16 px-4">
-          <Link
-            href="/"
-            className="flex flex-col items-center gap-1 text-zinc-500 hover:text-emerald-400 transition-colors flex-1"
-          >
-            <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
-            </svg>
-            <span className="text-[10px] font-bold uppercase tracking-tight">{t.common.home}</span>
-          </Link>
-
-          <button
-            onClick={toggleLang}
-            className="flex flex-col items-center gap-1 text-emerald-400 transition-colors flex-1"
-          >
-            <div className="w-5 h-5 flex items-center justify-center font-black text-xs border border-emerald-500/30 rounded-md bg-emerald-500/5">
-              {lang === 'en' ? 'AR' : 'EN'}
-            </div>
-            <span className="text-[10px] font-bold uppercase tracking-tight">{lang === 'en' ? 'عربي' : 'EN'}</span>
-          </button>
-
-          <div className="flex flex-col items-center gap-1 flex-1">
-            <UserButton
-              appearance={{
-                elements: {
-                  avatarBox: "w-5 h-5",
-                },
-              }}
-            />
-            <span className="text-[10px] font-bold uppercase tracking-tight text-zinc-500 mt-1">{t.common.profile || "Account"}</span>
-          </div>
-
-          <button
-            onClick={() => setShowProfileModal(true)}
-            className="flex flex-col items-center gap-1 text-zinc-500 hover:text-emerald-400 transition-colors flex-1"
-          >
-            <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
-            </svg>
-            <span className="text-[10px] font-bold uppercase tracking-tight">{t.common.profile}</span>
-          </button>
-        </div>
-      </nav>
+      <MobileNav
+        items={[
+          {
+            label: t.common.dashboard,
+            icon: (
+              <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
+              </svg>
+            ),
+            isActive: true,
+            onClick: () => window.scrollTo({ top: 0, behavior: 'smooth' })
+          },
+          {
+            label: t.common.home,
+            icon: (
+              <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
+              </svg>
+            ),
+            href: "/"
+          },
+          {
+            label: lang === 'en' ? 'عربي' : 'EN',
+            icon: (
+              <div className="w-5 h-5 flex items-center justify-center font-black text-xs border border-emerald-500/30 rounded-md bg-emerald-500/5">
+                {lang === 'en' ? 'AR' : 'EN'}
+              </div>
+            ),
+            onClick: toggleLang
+          },
+          {
+            label: t.common.profile,
+            icon: (
+              <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+              </svg>
+            ),
+            onClick: () => setShowProfileModal(true)
+          }
+        ]}
+      />
     </div>
   );
 }

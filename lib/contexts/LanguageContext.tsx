@@ -16,7 +16,7 @@ const DICTIONARY = {
     common: {
       home: "Home",
       dashboard: "Dashboard",
-      profile: "Profile",
+      profile: "Config",
       language: "Language",
       editProfile: "Edit Profile",
       setUpProfile: "Set Up Profile",
@@ -81,7 +81,7 @@ const DICTIONARY = {
     common: {
       home: "الرئيسية",
       dashboard: "لوحة التحكم",
-      profile: "الملف الشخصي",
+      profile: "الإعدادات",
       language: "اللغة",
       editProfile: "تعديل الملف الشخصي",
       setUpProfile: "إعداد الملف الشخصي",
