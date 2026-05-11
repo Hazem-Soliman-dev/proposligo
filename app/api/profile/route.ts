@@ -7,7 +7,8 @@ export async function GET() {
     let dbUser;
     try {
       dbUser = await ensureUser();
-    } catch {
+    } catch (e) {
+      console.error("ensureUser failed:", e);
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 

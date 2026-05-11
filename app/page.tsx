@@ -7,6 +7,7 @@ import ProfileForm from "@/components/ProfileForm";
 import { useLanguage } from "@/lib/contexts/LanguageContext";
 import SchemaMarkup from "@/components/SchemaMarkup";
 import MobileNav from "@/components/MobileNav";
+import Footer from "@/components/Footer";
 
 export default function Home() {
   const { lang, toggleLang, t } = useLanguage();
@@ -33,92 +34,100 @@ export default function Home() {
   }, [isSignedIn]);
 
   return (
-    <main
-      className="flex min-h-screen flex-col items-center justify-center p-8 text-center sm:p-24 relative overflow-hidden pb-32 sm:pb-24"
-    >
+    <main className="flex min-h-screen flex-col relative overflow-hidden">
       <SchemaMarkup />
-      {/* Background Glow */}
-      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px] bg-emerald-500/10 blur-[120px] rounded-full -z-10" />
+      {/* Background Glows */}
+      <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] bg-emerald-500/10 blur-[120px] rounded-full -z-10 animate-pulse" />
+      <div className="absolute bottom-[-10%] right-[-10%] w-[40%] h-[40%] bg-cyan-500/10 blur-[120px] rounded-full -z-10" />
+      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-emerald-500/5 blur-[150px] rounded-full -z-10" />
 
-      {/* Language Toggle - Desktop */}
-      <div className="hidden sm:block absolute top-8 right-8 left-auto rtl:right-auto rtl:left-8">
+      {/* Desktop Navigation */}
+      <div className="hidden sm:flex fixed top-8 right-8 left-auto rtl:right-auto rtl:left-8 z-50 items-center gap-3">
+        {!isSignedIn ? (
+          <SignInButton mode="modal">
+            <button className="px-6 py-2.5 rounded-xl bg-emerald-500 text-zinc-950 font-bold text-sm hover:bg-emerald-400 transition-all shadow-lg hover:scale-105 active:scale-95 cursor-pointer">
+              {lang === "ar" ? "تسجيل الدخول" : "Login"}
+            </button>
+          </SignInButton>
+        ) : (
+          <Link
+            href="/dashboard"
+            className="px-6 py-2.5 rounded-xl bg-emerald-500 text-zinc-950 font-bold text-sm hover:bg-emerald-400 transition-all shadow-lg hover:scale-105 active:scale-95 flex items-center gap-2"
+          >
+            {t.common.dashboard}
+            <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M13 7l5 5m0 0l-5 5m5-5H6" />
+            </svg>
+          </Link>
+        )}
         <button
           onClick={toggleLang}
-          className="px-4 py-2 rounded-xl border border-zinc-800 bg-zinc-900/50 text-emerald-400 hover:border-zinc-700 transition-all font-bold text-sm shadow-lg backdrop-blur-md min-w-[50px] flex items-center justify-center"
+          className="px-4 py-2.5 rounded-xl border border-zinc-800 bg-zinc-900/50 text-emerald-400 hover:border-zinc-700 transition-all font-bold text-sm shadow-lg backdrop-blur-md min-w-[50px] flex items-center justify-center cursor-pointer"
         >
           {lang === "en" ? "AR" : "EN"}
         </button>
       </div>
 
-      <div className="z-10 w-full max-w-5xl items-center justify-center font-sans text-sm flex flex-col space-y-8 sm:space-y-12">
-        <h1 className="text-6xl font-extrabold tracking-tight sm:text-8xl bg-gradient-to-r from-emerald-400 to-cyan-400 bg-clip-text text-transparent pb-2 animate-in fade-in slide-in-from-bottom-8 duration-700">
-          ProposliGo
-        </h1>
-        <p className="text-xl sm:text-2xl text-zinc-400 max-w-2xl text-balance animate-in fade-in slide-in-from-bottom-12 duration-1000">
-          {t.home.hero_subtitle}
-        </p>
-
-        <div className="hidden sm:flex gap-4 animate-in fade-in slide-in-from-bottom-16 duration-1000 delay-300">
-          {!isSignedIn ? (
-            <>
-              <SignInButton mode="modal">
-                <button className="rounded-full bg-emerald-500 px-10 py-5 text-xl font-bold text-zinc-950 hover:bg-emerald-400 transition-all shadow-[0_0_40px_rgba(16,185,129,0.2)] hover:scale-105 active:scale-95 cursor-pointer">
-                  {t.home.cta}
-                </button>
-              </SignInButton>
-              <SignUpButton mode="modal">
-                <button className="rounded-full border-2 border-emerald-500 px-10 py-5 text-xl font-bold text-emerald-400 hover:bg-emerald-500/10 transition-all hover:scale-105 active:scale-95 cursor-pointer">
-                  {lang === "ar" ? "إنشاء حساب" : "Sign Up"}
-                </button>
-              </SignUpButton>
-            </>
-          ) : (
-            <Link
-              href="/dashboard"
-              className="rounded-full bg-emerald-500 px-10 py-5 text-xl font-bold text-zinc-950 hover:bg-emerald-400 transition-all shadow-[0_0_40px_rgba(16,185,129,0.2)] hover:scale-105 active:scale-95"
-            >
-              {t.common.dashboard}
-            </Link>
-          )}
-        </div>
-
-        <div className="grid gap-4 sm:gap-6 sm:grid-cols-3 mt-2 sm:mt-8 text-start w-full">
-          <div className="rounded-2xl border border-zinc-800 bg-zinc-900/50 p-6 backdrop-blur-sm hover:border-zinc-700 transition-colors group">
-            <div className="w-10 h-10 rounded-lg bg-emerald-500/10 flex items-center justify-center text-emerald-400 mb-4 group-hover:scale-110 transition-transform">
-              <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
-              </svg>
-            </div>
-            <h3 className="text-xl font-bold text-zinc-100 mb-2">{t.home.feature1_title}</h3>
-            <p className="text-zinc-400 leading-relaxed">{t.home.feature1_desc}</p>
+      <div className="flex flex-col items-center justify-center p-8 text-center sm:p-24 w-full flex-1">
+        <div className="z-10 w-full max-w-5xl items-center justify-center font-sans text-sm flex flex-col space-y-8 sm:space-y-12">
+          <div className="flex flex-col items-center space-y-8 sm:space-y-12 w-full">
+            <h1 className="text-6xl font-[1000] tracking-tighter sm:text-8xl bg-gradient-to-r from-emerald-400 via-emerald-300 to-cyan-400 bg-clip-text text-transparent pb-4 animate-in fade-in slide-in-from-bottom-12 duration-1000 ease-out leading-tight text-balance">
+              ProposliGo
+            </h1>
+            <p className="text-xl sm:text-2xl text-zinc-400 max-w-3xl text-balance animate-in fade-in slide-in-from-bottom-16 duration-1000 delay-200 font-medium leading-relaxed px-4 sm:px-0">
+              {t.home.hero_subtitle}
+            </p>
           </div>
 
-          <div className="rounded-2xl border border-zinc-800 bg-zinc-900/50 p-6 backdrop-blur-sm hover:border-zinc-700 transition-colors group">
-            <div className="w-10 h-10 rounded-lg bg-emerald-500/10 flex items-center justify-center text-emerald-400 mb-4 group-hover:scale-110 transition-transform">
-              <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
-              </svg>
+          <div className="grid gap-4 sm:gap-6 sm:grid-cols-3 mt-2 sm:mt-8 text-start w-full max-w-6xl px-0">
+            <div className="rounded-[2.5rem] border border-zinc-800/40 bg-[#09090b]/80 p-6 sm:p-10 backdrop-blur-2xl hover:border-emerald-500/40 transition-all duration-700 group relative overflow-hidden shadow-[0_0_50px_rgba(0,0,0,0.5)]">
+              <div className="absolute inset-0 bg-gradient-to-br from-emerald-500/10 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-700" />
+              <div className="w-14 h-14 rounded-2xl bg-[#0d1612] flex items-center justify-center text-emerald-500 mb-5 sm:mb-10 group-hover:scale-110 group-hover:rotate-3 transition-transform duration-700 relative z-10 border border-emerald-500/20 shadow-[0_0_20px_rgba(16,185,129,0.1)]">
+                <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
+                </svg>
+              </div>
+              <div className="relative z-10">
+                <h3 className="text-2xl font-black text-white mb-4 tracking-tight group-hover:text-emerald-400 transition-colors duration-500">{t.home.feature1_title}</h3>
+                <p className="text-zinc-400 leading-relaxed text-base font-medium opacity-90 group-hover:opacity-100 transition-opacity duration-500">{t.home.feature1_desc}</p>
+              </div>
             </div>
-            <h3 className="text-xl font-bold text-zinc-100 mb-2">{t.home.feature2_title}</h3>
-            <p className="text-zinc-400 leading-relaxed">{t.home.feature2_desc}</p>
-          </div>
 
-          <div className="rounded-2xl border border-zinc-800 bg-zinc-900/50 p-6 backdrop-blur-sm hover:border-zinc-700 transition-colors group">
-            <div className="w-10 h-10 rounded-lg bg-emerald-500/10 flex items-center justify-center text-emerald-400 mb-4 group-hover:scale-110 transition-transform">
-              <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-              </svg>
+            <div className="rounded-[2.5rem] border border-zinc-800/40 bg-[#09090b]/80 p-6 sm:p-10 backdrop-blur-2xl hover:border-emerald-500/40 transition-all duration-700 group relative overflow-hidden shadow-[0_0_50px_rgba(0,0,0,0.5)]">
+              <div className="absolute inset-0 bg-gradient-to-br from-emerald-500/10 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-700" />
+              <div className="w-14 h-14 rounded-2xl bg-[#0d1612] flex items-center justify-center text-emerald-500 mb-5 sm:mb-10 group-hover:scale-110 group-hover:rotate-3 transition-transform duration-700 relative z-10 border border-emerald-500/20 shadow-[0_0_20px_rgba(16,185,129,0.1)]">
+                <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                </svg>
+              </div>
+              <div className="relative z-10">
+                <h3 className="text-2xl font-black text-white mb-4 tracking-tight group-hover:text-emerald-400 transition-colors duration-500">{t.home.feature2_title}</h3>
+                <p className="text-zinc-400 leading-relaxed text-base font-medium opacity-90 group-hover:opacity-100 transition-opacity duration-500">{t.home.feature2_desc}</p>
+              </div>
             </div>
-            <h3 className="text-xl font-bold text-zinc-100 mb-2">{t.home.feature3_title}</h3>
-            <p className="text-zinc-400 leading-relaxed">{t.home.feature3_desc}</p>
+
+            <div className="rounded-[2.5rem] border border-zinc-800/40 bg-[#09090b]/80 p-6 sm:p-10 backdrop-blur-2xl hover:border-emerald-500/40 transition-all duration-700 group relative overflow-hidden shadow-[0_0_50px_rgba(0,0,0,0.5)]">
+              <div className="absolute inset-0 bg-gradient-to-br from-emerald-500/10 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-700" />
+              <div className="w-14 h-14 rounded-2xl bg-[#0d1612] flex items-center justify-center text-emerald-500 mb-5 sm:mb-10 group-hover:scale-110 group-hover:rotate-3 transition-transform duration-700 relative z-10 border border-emerald-500/20 shadow-[0_0_20px_rgba(16,185,129,0.1)]">
+                <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                </svg>
+              </div>
+              <div className="relative z-10">
+                <h3 className="text-2xl font-black text-white mb-4 tracking-tight group-hover:text-emerald-400 transition-colors duration-500">{t.home.feature3_title}</h3>
+                <p className="text-zinc-400 leading-relaxed text-base font-medium opacity-90 group-hover:opacity-100 transition-opacity duration-500">{t.home.feature3_desc}</p>
+              </div>
+            </div>
           </div>
         </div>
       </div>
 
+      <Footer />
+
       <MobileNav
         items={[
           !isSignedIn ? {
-            label: lang === "ar" ? "تسجيل" : "Sign In",
+            label: lang === "ar" ? "تسجيل الدخول" : "Login",
             icon: (
               <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013-3v1" />
