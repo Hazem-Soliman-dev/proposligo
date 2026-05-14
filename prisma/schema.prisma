@@ -15,6 +15,7 @@ model User {
   createdAt DateTime   @default(now())
   profile   Profile?
   proposals Proposal[]
+  creditTransactions CreditTransaction[]
 }
 
 model Profile {
@@ -38,4 +39,23 @@ model Proposal {
 
   @@index([userId])
   @@index([createdAt])
+}
+
+model CreditTransaction {
+  id                String   @id @default(cuid())
+  userId            String
+  stripeSessionId   String?  @unique
+  stripePaymentIntent String?
+  polarCheckoutId   String?  @unique
+  polarOrderId      String?  @unique
+  amount            Int
+  pricePaidCents    Int
+  tier              String
+  status            String   @default("completed")
+  createdAt         DateTime @default(now())
+  user              User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([stripeSessionId])
+  @@index([polarCheckoutId])
 }

@@ -7,6 +7,7 @@ import type { GenerateRequest, GenerateResponse, Tone, Template, ProfileData } f
 import ProfileForm from "@/components/ProfileForm";
 import { useLanguage } from "@/lib/contexts/LanguageContext";
 import MobileNav from "@/components/MobileNav";
+import BuyCreditsDialog from "@/components/BuyCreditsDialog";
 
 const TONE_OPTIONS: Tone[] = ["professional", "aggressive", "concise", "friendly", "bold"];
 
@@ -25,20 +26,77 @@ export default function Dashboard() {
   const [showProfileModal, setShowProfileModal] = useState(false);
   const [profileData, setProfileData] = useState<ProfileData | null>(null);
 
+  // Buy credits state
+  const [showBuyCreditsModal, setShowBuyCreditsModal] = useState(false);
+  const [purchaseSuccess, setPurchaseSuccess] = useState(false);
+
   const fetchProfile = useCallback(async () => {
     try {
-      const res = await fetch("/api/profile");
+      const res = await fetch(`/api/profile?t=${new Date().getTime()}`, {
+        cache: 'no-store',
+        headers: {
+          'Cache-Control': 'no-cache',
+          'Pragma': 'no-cache'
+        }
+      });
       if (res.ok) {
         const data = await res.json();
         setProfileData(data.profile);
         if (typeof data.credits === 'number') {
-          setCredits(data.credits);
+          setCredits((prevCredits) => {
+            // Only update if credits actually changed
+            return data.credits;
+          });
         }
+        return data.credits;
       }
     } catch {
       // Profile fetch is non-critical, silently ignore
     }
+    return null;
   }, []);
+
+  useEffect(() => {
+    // Check for purchase success in URL
+    if (typeof window !== 'undefined') {
+      const params = new URLSearchParams(window.location.search);
+      const isSuccess = params.get('purchase') === 'success';
+      const checkoutId = params.get('checkout_id') || params.get('session_id');
+      
+      if (isSuccess) {
+        setPurchaseSuccess(true);
+        // Clean up URL without reloading
+        window.history.replaceState({}, '', '/dashboard');
+        
+        // Hide success message after 5 seconds
+        setTimeout(() => setPurchaseSuccess(false), 5000);
+
+        // Verify the session immediately to grant credits (bypasses local webhook requirement)
+        if (checkoutId) {
+          fetch(`/api/checkout/verify?checkout_id=${checkoutId}`)
+            .then(res => res.json())
+            .then(data => {
+              if (data.status === 'fulfilled' || data.status === 'already_fulfilled') {
+                fetchProfile();
+              }
+            })
+            .catch(console.error);
+        }
+
+        // The webhook might take a few seconds to update the database.
+        // We'll poll the profile a few times to ensure the UI updates with the new credits.
+        let attempts = 0;
+        const initialCredits = credits;
+        const intervalId = setInterval(async () => {
+          attempts++;
+          const currentCredits = await fetchProfile();
+          if ((currentCredits !== null && currentCredits > initialCredits) || attempts >= 5) {
+            clearInterval(intervalId);
+          }
+        }, 2000); // Poll every 2 seconds, max 5 times (10s total)
+      }
+    }
+  }, [fetchProfile, credits]);
 
   useEffect(() => {
     fetchProfile();
@@ -112,12 +170,22 @@ export default function Dashboard() {
                 </div>
               </div>
               <div className="flex items-center gap-2">
-                <div className="flex items-center p-2 rounded-2xl bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 shadow-inner group transition-all hover:bg-emerald-500/20">
+                <button
+                  onClick={() => setShowBuyCreditsModal(true)}
+                  className={`flex items-center p-2 rounded-2xl border transition-all cursor-pointer group ${
+                    credits === 0 
+                      ? "bg-red-500/10 border-red-500/30 text-red-400 hover:bg-red-500/20" 
+                      : credits <= 3
+                      ? "bg-amber-500/10 border-amber-500/30 text-amber-400 hover:bg-amber-500/20 animate-pulse"
+                      : "bg-emerald-500/10 border-emerald-500/20 text-emerald-400 hover:bg-emerald-500/20 shadow-inner"
+                  }`}
+                  title={t.credits.title}
+                >
                   <svg className="w-4 h-4 group-hover:scale-110 transition-transform" fill="currentColor" viewBox="0 0 24 24">
                     <path d="M13 10V3L4 14h7v7l9-11h-7z" />
                   </svg>
                   <span className="text-sm font-black tracking-tight px-1">{credits}</span>
-                </div>
+                </button>
                 <button
                   onClick={toggleLang}
                   className="hidden sm:block p-2 rounded-2xl border border-zinc-800 bg-zinc-900/50 text-emerald-400 hover:border-emerald-500/30 transition-all font-black text-xs tracking-widest shadow-sm cursor-pointer"
@@ -149,6 +217,20 @@ export default function Dashboard() {
             {error && (
               <div className="mb-6 p-4 bg-red-900/20 border border-red-500/30 text-red-400 rounded-2xl text-sm font-medium animate-in fade-in slide-in-from-top-2">
                 {error}
+              </div>
+            )}
+
+            {purchaseSuccess && (
+              <div className="mb-6 p-4 bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 rounded-2xl text-sm font-medium flex items-center gap-3 animate-in fade-in slide-in-from-top-2">
+                <div className="w-8 h-8 rounded-full bg-emerald-500/20 flex items-center justify-center shrink-0">
+                  <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                  </svg>
+                </div>
+                <div>
+                  <p className="font-bold">{t.credits.successTitle}</p>
+                  <p className="text-xs opacity-80">{t.credits.successSubtitle}</p>
+                </div>
               </div>
             )}
 
@@ -222,21 +304,34 @@ export default function Dashboard() {
                 </div>
               </div>
 
-              <button
-                onClick={handleGenerate}
-                disabled={isPending || jobDescription.length === 0 || credits === 0}
-                className="group relative w-full py-5 rounded-[1.5rem] bg-emerald-500 text-zinc-950 font-black text-lg hover:bg-emerald-400 disabled:opacity-50 disabled:cursor-not-allowed transition-all shadow-[0_20px_50px_rgba(16,185,129,0.3)] hover:scale-[1.02] active:scale-[0.98] flex items-center justify-center gap-3 overflow-hidden"
-              >
-                <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent -translate-x-full group-hover:animate-[shimmer_2s_infinite] pointer-events-none" />
-                {isPending ? (
-                  <div className="w-6 h-6 border-4 border-zinc-950/30 border-t-zinc-950 rounded-full animate-spin" />
-                ) : (
-                  <svg className="w-6 h-6 transition-transform group-hover:translate-x-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              {credits === 0 ? (
+                <button
+                  onClick={() => setShowBuyCreditsModal(true)}
+                  className="group relative w-full py-5 rounded-[1.5rem] bg-gradient-to-r from-emerald-500 to-cyan-500 text-zinc-950 font-black text-lg hover:opacity-90 transition-all shadow-[0_20px_50px_rgba(16,185,129,0.3)] hover:scale-[1.02] active:scale-[0.98] flex items-center justify-center gap-3 overflow-hidden"
+                >
+                  <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent -translate-x-full group-hover:animate-[shimmer_2s_infinite] pointer-events-none" />
+                  <svg className="w-6 h-6 transition-transform group-hover:scale-110" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M13 10V3L4 14h7v7l9-11h-7z" />
                   </svg>
-                )}
-                {isPending ? t.dashboard.generatingBtn : t.dashboard.generateBtn}
-              </button>
+                  {t.credits.buyBtn}
+                </button>
+              ) : (
+                <button
+                  onClick={handleGenerate}
+                  disabled={isPending || jobDescription.length === 0}
+                  className="group relative w-full py-5 rounded-[1.5rem] bg-emerald-500 text-zinc-950 font-black text-lg hover:bg-emerald-400 disabled:opacity-50 disabled:cursor-not-allowed transition-all shadow-[0_20px_50px_rgba(16,185,129,0.3)] hover:scale-[1.02] active:scale-[0.98] flex items-center justify-center gap-3 overflow-hidden"
+                >
+                  <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent -translate-x-full group-hover:animate-[shimmer_2s_infinite] pointer-events-none" />
+                  {isPending ? (
+                    <div className="w-6 h-6 border-4 border-zinc-950/30 border-t-zinc-950 rounded-full animate-spin" />
+                  ) : (
+                    <svg className="w-6 h-6 transition-transform group-hover:translate-x-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M13 10V3L4 14h7v7l9-11h-7z" />
+                    </svg>
+                  )}
+                  {isPending ? t.dashboard.generatingBtn : t.dashboard.generateBtn}
+                </button>
+              )}
             </div>
           </div>
         </div>
@@ -310,6 +405,12 @@ export default function Dashboard() {
           }}
         />
       )}
+
+      {/* Buy Credits Modal */}
+      <BuyCreditsDialog
+        isOpen={showBuyCreditsModal}
+        onClose={() => setShowBuyCreditsModal(false)}
+      />
 
       <MobileNav
         items={[

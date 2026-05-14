@@ -4,9 +4,15 @@ const isProtectedRoute = createRouteMatcher([
   "/dashboard(.*)",
   "/api/generate(.*)",
   "/api/profile(.*)",
+  "/api/checkout(.*)",
 ]);
 
 export default clerkMiddleware(async (auth, req) => {
+  // Polar webhooks must bypass Clerk auth
+  if (req.nextUrl.pathname.startsWith("/api/webhooks/")) {
+    return;
+  }
+  
   if (isProtectedRoute(req)) {
     await auth.protect();
   }
