@@ -49,7 +49,7 @@ export function resolveCreditsFromMetadata(metadata: CheckoutMetadata | null | u
       : 0;
 
   if (Number.isFinite(creditsValue) && creditsValue > 0) {
-    return { credits: creditsValue, tierId: tierFromMetadata?.id ?? "custom" };
+    return { credits: creditsValue, tierId: "custom" };
   }
 
   const tier = findTierByAmountCents(fallbackAmountCents);
@@ -57,5 +57,5 @@ export function resolveCreditsFromMetadata(metadata: CheckoutMetadata | null | u
     return { credits: tier.credits, tierId: tier.id };
   }
 
-  return { credits: 0, tierId: tierFromMetadata?.id ?? "unknown" };
+  return { credits: 0, tierId: "unknown" };
 }
